@@ -1,69 +1,86 @@
+#goal is to extract fasta data from uniprot db and find the motif locations in
+#the protein sequence
 
-f= open('rosalind_lcsm.txt','r')
-o= open('output.txt', 'w')
+#allows use of end='' 
+from __future__ import print_function
 
-#finds a matching substring to the entry substring
-def motiffinder(n,motif):
-   hit=''
-   #traverse through dictionary, finds substring in DNA string
-   #return None if substring not there
-   for key,value in dict.items(n):
-       if motif in value:
-            hit=motif
-            return hit
-       else:
-           return None
+#needed to access db
+import urllib
+import contextlib
+
+#regex python searches for set pattern of characters
+#regex stands for regular expression
+#searching through iteration of sequence doesn't work for some reason
+import re 
+
+#method to extract data from uniprot fasta
+def readuniprotfasta(proteinurl):
+    sequence=''
+
+    #use the with statement for future access to uniprot database for fasta files
+    with contextlib.closing(urllib.urlopen(proteinurl)) as f:
+         #extracting the protein seq from fasta   
+         for line in f:
+             if '>' not in line:
+                 sequence=sequence+line.strip()
+
+    return sequence
+
+
+#motif sequence=N{P}[ST]{P}
+#motif reqex search sequence=N[^P][ST][^P]           
+def motiffinder(sequence,line, protein):
+
+    finallist=[]
+    for i in range(0, len(sequence)):
+
+        #regex can't do repeat searches on strings that have been a match
+        #requires iteration through string to search for all possible hits
+        hitlist=re.findall('N[^P][ST][^P]',sequence[i:len(sequence)])
+
+        #combine each list from iterating
+        finallist=finallist+hitlist
         
-#converts database into key/value pair
-Dnadata={}
-string=''
-for line in f:
-    #identifies if line is id line
-    if '>' in line:
-        line=line.strip()
-        Dnadata.update({line:''})
-        string=line
-    #identifies dna strand, also concatenates
-    #stores it to appropriate fasta id
+        #converts to dict then list type to remove duplicates
+        finallist=list(dict.fromkeys(finallist))
+
+    location=[]
+    for i in finallist:
+        location.append(sequence.find(i)+1)
+    location.sort()          
+
+
+    output(location,protein)
+
+    
+   
+#output to file         
+def output(location, protein):
+    
+    #if no motifs, just skips
+    if not location:
+        pass
+    
     else:
-        Dnadata.update({string:str(Dnadata[string]+line).strip()})
+        #print(protein)
+        #print(location)
+        with open('output.txt', 'a') as o:
+            o.write(('\n'+protein).strip())
+            o.write('\n'+' '.join([str(pos) for pos in location])+'\n')
+            
 
+#'with' keyword opens up file and closes it automatically 
+with open('input.txt','r') as f:
+    for line in f:
+        protein=line
+        if '_' in line:
 
-#goes through dictionary and takes all possible substrings in an entry.
-#only takes all substrings from one dictionary entry 
-hit=[]
-suspect=''
-motif=''
-i=0
-finderdict={}
-for key, value in dict.items(Dnadata):
-    #create a separate copy of Dnadata for motiffinder
-    finderdict=Dnadata.copy()
-    finderdict.pop(key)
+            #removes characters from underscore and beyond
+            protein=line.split('_',1)[0]
+            
+        #need correct url to access fasta file    
+        proteinurl='http://www.uniprot.org/uniprot/'+protein.strip()+'.fasta'
+        
+        #method to extract fasta file contents and search for motif
+        motiffinder(readuniprotfasta(proteinurl),protein,line)
 
-
-    while i<len(value)-1:
-        for start in range(0,len(value)):
-            suspect=value[start:len(value)-i]
-
-            #doesn't check for single nucleotides
-            if len(suspect)>1:
-                #sends substring to motiffinder function to check if its a motif
-                motif=motiffinder(finderdict,suspect)
-
-                #adds the motif to an array 
-                if motif!=None:
-                    hit.append(motif)
-                
-        i=i+1
-    break
-
-#sorts array of motifs by length
-hit.sort(key=len)
-         
-#output longest motif
-print(hit[len(hit)-1])
-
-          
-f.close()
-o.close()
