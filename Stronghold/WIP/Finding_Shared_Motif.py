@@ -1,4 +1,4 @@
-# code WIP
+
 f= open('rosalind_lcsm.txt','r')
 o= open('output.txt', 'w')
 
