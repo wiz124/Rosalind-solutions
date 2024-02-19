@@ -5,8 +5,9 @@
 from __future__ import print_function
 
 #needed to access db
-import urllib
+import urllib.request
 import contextlib
+
 
 #regex python searches for set pattern of characters
 #regex stands for regular expression
@@ -17,13 +18,10 @@ import re
 def readuniprotfasta(proteinurl):
     sequence=''
 
-    #use the with statement for future access to uniprot database for fasta files
-    with contextlib.closing(urllib.urlopen(proteinurl)) as f:
-         #extracting the protein seq from fasta   
-         for line in f:
-             if '>' not in line:
-                 sequence=sequence+line.strip()
-
+   #opens and reads protein sequence from fasta file
+    for line in urllib.request.urlopen(proteinurl):
+        sequence=sequence+line.decode('utf-8')
+           
     return sequence
 
 
@@ -79,8 +77,10 @@ with open('input.txt','r') as f:
             protein=line.split('_',1)[0]
             
         #need correct url to access fasta file    
-        proteinurl='http://www.uniprot.org/uniprot/'+protein.strip()+'.fasta'
+        proteinurl='http://rest.uniprot.org/uniprotkb/'+protein.strip()+'.fasta'
         
         #method to extract fasta file contents and search for motif
-        motiffinder(readuniprotfasta(proteinurl),protein,line)
+        sequence=readuniprotfasta(proteinurl)
+        motiffinder(sequence,protein,line)
+
 
