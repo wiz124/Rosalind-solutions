@@ -20,8 +20,15 @@ def readuniprotfasta(proteinurl):
 
    #opens and reads protein sequence from fasta file
     for line in urllib.request.urlopen(proteinurl):
-        sequence=sequence+line.decode('utf-8')
-           
+        #removes other garbage from fasta file
+        if '>' in str(line):
+            pass
+        else:
+            sequence=sequence+line.decode('utf-8')
+
+
+    print(sequence)
+    
     return sequence
 
 
@@ -80,7 +87,6 @@ with open('input.txt','r') as f:
         proteinurl='http://rest.uniprot.org/uniprotkb/'+protein.strip()+'.fasta'
         
         #method to extract fasta file contents and search for motif
-        sequence=readuniprotfasta(proteinurl)
-        motiffinder(sequence,protein,line)
+        motiffinder(readuniprotfasta(proteinurl),protein,line)
 
 
