@@ -24,7 +24,7 @@ def readuniprotfasta(proteinurl):
         if '>' in str(line):
             pass
         else:
-            sequence=sequence+line.decode('utf-8')
+            sequence=sequence+line.decode('utf-8').strip()
 
 
     print(sequence)
@@ -37,25 +37,29 @@ def readuniprotfasta(proteinurl):
 def motiffinder(sequence,line, protein):
 
     finallist=[]
-    for i in range(0, len(sequence)):
-
+    i=0
+    while i <=len(sequence):
         #regex can't do repeat searches on strings that have been a match
         #requires iteration through string to search for all possible hits
-        hitlist=re.findall('N[^P][ST][^P]',sequence[i:len(sequence)])
+        hitlist=re.search('N[^P][ST][^P]',sequence[i:len(sequence)])
 
-        #combine each list from iterating
-        finallist=finallist+hitlist
-        
-        #converts to dict then list type to remove duplicates
-        finallist=list(dict.fromkeys(finallist))
+    
+     #try except block incase re.search comes up with nothing
+        try:
+            #add i so no same sequence found over and over
+            finallist.append(int(hitlist.start())+i+1)
+       
+            #converts to dict then list type to remove duplicates
+            finallist=list(dict.fromkeys(finallist))
+            i=i+int(hitlist.start())+1
+        except:
+            i+=1
+            pass
 
-    location=[]
-    for i in finallist:
-        location.append(sequence.find(i)+1)
-    location.sort()          
+    
+    print(finallist)
 
-
-    output(location,protein)
+    output(finallist,protein)
 
     
    
@@ -75,7 +79,7 @@ def output(location, protein):
             
 
 #'with' keyword opens up file and closes it automatically 
-with open('input.txt','r') as f:
+with open('rosalind_mprt.txt','r') as f:
     for line in f:
         protein=line
         if '_' in line:
@@ -88,5 +92,3 @@ with open('input.txt','r') as f:
         
         #method to extract fasta file contents and search for motif
         motiffinder(readuniprotfasta(proteinurl),protein,line)
-
-
