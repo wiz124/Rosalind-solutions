@@ -27,7 +27,7 @@ def readuniprotfasta(proteinurl):
             sequence=sequence+line.decode('utf-8').strip()
 
 
-    print(sequence)
+    #print(sequence)
     
     return sequence
 
@@ -57,7 +57,7 @@ def motiffinder(sequence,line, protein):
             pass
 
     
-    print(finallist)
+    #print(finallist)
 
     output(finallist,protein)
 
