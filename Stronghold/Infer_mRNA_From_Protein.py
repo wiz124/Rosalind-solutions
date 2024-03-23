@@ -20,24 +20,34 @@ def totalstrings(aminoacid):
         'UGG':'W',   'CGG':'R', 'AGG':'R', 'GGG':'G'}
 
     codons=[]
+    #codonstrings=[]
     possiblestrings=3 #start with 3 because 3 possible stop codons
+
+    n=1000000
     
     #find how many codons correspond to which aa
     for char in aminoacid:
         codons.clear()
+
+        #finds corresponding sequences in table
         for key,value in dict.items(codontable):
             if value == char:
                 codons.append(key)
+
+                #codonstrings.append(len(codons))
+                
         #multiply to find possible combinations
         possiblestrings=possiblestrings*len(codons)
+            
+            
+    print(possiblestrings%n)
 
-    print(possiblestrings)
+
 
 #input
-with open('input.txt','r') as f:
+with open('rosalind_mrna.txt','r') as f:
     aminoacids=''
     for line in f:
         aminoacids=aminoacids+line.strip()
 
     totalstrings(aminoacids)
-
