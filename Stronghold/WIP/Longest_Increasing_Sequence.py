@@ -1,35 +1,30 @@
-def increase(n, perm):
-    smallest = 0
-    increasing = []
-    try:
-        for i in range(0, int(n)):
+#algorithm
 
-            p = int(perm[i])
-            if p > smallest and int(perm[i + 1]) > smallest and smallest < int(perm[i + 1]):
-                smallest = int(perm[i + 1])
-                increasing.append(smallest)
-    except:
-        if smallest < int(perm[len(perm) - 1]):
-            increasing.append(int(perm[len(perm) - 1]))
-
-    print(increasing)
+#def Main(n, perm):
+#    for i in perm:
 
 
+
+
+
+
+#parse input file
 with open('input.txt', 'r') as f:
-    n = ''
+
+    n = 0
     perm = []
     strings = []
 
     for line in f:
-        strings.append(line.strip().replace(' ', ''))
+        strings.append(line.strip())
 
-    n = strings[0]
-    for i in strings[1]:
-        perm.append(i)
 
-    increase(n, perm)
-    perm.reverse()
-    increase(n, perm)
+#convert everything to int
+    n = int(strings[0])
+    perm=list(map(int,strings[1].split(' ')))
+
+    #Main(n,perm)
+    
 
 '''
 5
