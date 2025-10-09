@@ -3,7 +3,7 @@
 #create a table
 #ie.
 #  A T T A G A C C T G  (superstring)
-#A 1     1
+#A 1     1   1
 #G         1         1
 #A 1     1   1
 #C             1 1
@@ -19,7 +19,6 @@
         # if same index value, then same string
 
 #global variables
-superstring=''
 
 #check the diagonal to determine length of longest substring
 def diagonalcheck(sub_gene,sub_superstring):
@@ -35,26 +34,37 @@ def diagonalcheck(sub_gene,sub_superstring):
 
 
 #checks for common character from gene to superstring, only looks for hits
-def string_table(gene,superstring):
+def string_table(gene,x_axis_string):
     high_score=0
     substring_length=0
 
-    for gene_char in gene: #gene is y axis
+    for gene_index in range(0,len(gene)): #gene is y axis
+        print(f'gene char {gene[gene_index]}')
 
-        for super_char in superstring:  #superstring is x axis, traversed per char in gene
+        for super_index in range(0,len(x_axis_string)):  #superstring is x axis, string traversed in reverse direction
 
-            if gene_char==super_char:
+            #if matching characters appear, takes the index position and passes it through to diagonal check function
+            #superstring(x_axis_string) will be traversed in the right->left direction, reverse_index will give char position
+            # of such traversal
 
-                gene_char_index= gene.index(gene_char)+1
-                super_char_index= superstring.index(super_char)+1
+            reverse_index=len(x_axis_string)-super_index-1
 
-                if super_char_index<=len(superstring) or gene_char_index<=len(gene):
-                    substring_length=diagonalcheck(gene[gene_char_index:],superstring[super_char_index:])
+            if gene[gene_index]==x_axis_string[reverse_index]:
 
-                if substring_length > high_score:
-                    high_score = substring_length
+                if super_index<len(x_axis_string) or gene_index<=len(gene):
 
-        print(gene_char+' '+str(high_score))
+                    print(f'substring: {gene[gene_index:]}')
+                    print(f'superstring-substring: {x_axis_string[reverse_index:]}')
+
+                    substring_length=diagonalcheck(gene[gene_index:],x_axis_string[reverse_index:])
+
+                    print(f'length {substring_length}')
+                    print(' ')
+
+                # if substring_length > high_score:
+                #     high_score = substring_length
+
+        # print(gene_char+' '+str(high_score))
 
 
 
@@ -68,10 +78,7 @@ with open('input.txt','r') as f:
 superstring=str(geneassembly[0])
 geneassembly.pop(0)
 
-#print(superstring)
-
 for genome in geneassembly:
-    #print(genome)
     string_table(genome, superstring)
 
 
