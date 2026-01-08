@@ -1,15 +1,13 @@
-# def find_max(numbers):
-#    max_num = numbers[0]
-#    for num in numbers:
-#        if num > max_num:
-#            max_num = num
-#    return max_num
-#
-# print(find_max([3, 5, 2, 8, 6])) # Expected output: 8
-# print(find_max([-1, -5, -3, -4])) # Expected output: -1
-# print(find_max([7])) # Expected output: 7
-# print(find_max([])) # Expected output: None
+from Bio import SeqIO
+with open('input.txt', 'r') as f:
+    database=[]
+    for entry in SeqIO.parse(f, 'fasta'):
+        database.append(entry.seq)
+# print(database)
+gene=database[1]
+superstring=database[0]
+print(superstring)
+print(gene)
+print(gene[:len(gene)//2])
+print(gene[len(gene)//2:])
 
-
-string='abcdefg'
-print(string[1:3])

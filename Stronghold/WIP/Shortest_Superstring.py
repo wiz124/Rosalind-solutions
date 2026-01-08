@@ -29,10 +29,10 @@
 # from the table, we see longest diagonal is the longest common substring
 #compare indices from each string, largest index value gets appended to by the string with smallest index value
         # if same index value, then same string
-#------------------------#
-#global variables
-superstring=''
-#------------------------#
+
+#module more efficiently reads fasta files
+from Bio import SeqIO
+
 def output(superstring):
     with open('output.txt','w') as f:
         f.write(superstring)
@@ -56,45 +56,60 @@ def string_concat(substring, genome,superstring):
 
 #check the diagonal to determine length of longest substring
 def diagonalcheck(sub_gene,sub_superstring):
+    longest_length=0
 
+    for i in range(len(sub_gene)):
+        if sub_gene[:i] in sub_superstring and longest_length<len(sub_gene[:i]):
+            longest_length=len(sub_gene[:i])
+        else:
+            continue
+    return longest_length
 
-    if sub_gene[0]!=sub_superstring[0]:
-
-        return 0
-    elif len(sub_gene)==1 or len(sub_superstring)==1:
+#recursive solution for funsies
+    # if sub_gene[0]!=sub_superstring[0]:
+    #
+    #     return 0
+    # elif len(sub_gene)==1 or len(sub_superstring)==1:
+    #     return 1
+    # else:
+    #     return 1 +diagonalcheck(sub_gene[1:],sub_superstring[1:])
+def if_overlap(gene, superstring):
+    gene_firsthalf=gene[:len(gene)//2]
+    gene_secondhalf=gene[len(gene)//2:]
+    if gene_firsthalf not in superstring and gene_secondhalf not in superstring:
+        return 3
+    elif gene_firsthalf in superstring:
         return 1
-    else:
-        return 1 +diagonalcheck(sub_gene[1:],sub_superstring[1:])
-
-
+    elif gene_secondhalf in superstring:
+        return 2
 
 #checks for common character from gene to superstring, only looks for hits
-def string_table(gene,x_axis_string):
+def string_table(gene, superstring):
     temp_length=0
     substring_pos=[]
 
 
     for gene_index in range(0,len(gene)): #gene is y axis
 
-            for super_index in range(0,len(x_axis_string)):  #superstring is x axis, string traversed in reverse direction
-
+            for super_index in range(0, len(superstring)):  #superstring is x axis, string traversed in reverse direction
+                reverse_index = len(superstring) - super_index - 1
                 #if matching characters appear, takes the index position and passes it through to diagonal check function
                 #superstring(x_axis_string) will be traversed in the right->left direction, reverse_index will give char position
                 # of such traversal
 
-                reverse_index=len(x_axis_string)-super_index-1
 
-                if gene[gene_index]==x_axis_string[reverse_index]:
+                if gene[gene_index]==superstring[reverse_index]:
 
-                    if super_index<len(x_axis_string) or gene_index<=len(gene):
+                    if super_index<len(superstring) or gene_index<=len(gene):
 
-                        substring_length=diagonalcheck(gene[gene_index:],x_axis_string[reverse_index:])
+                        substring_length=diagonalcheck(gene[gene_index:], superstring[reverse_index:])
 
-                        if temp_length<substring_length and substring_length>len(gene)//2:
+                        if temp_length<substring_length:
                             temp_length=substring_length
                             end_index=gene_index+substring_length
                             start_index=gene_index
                             substring_pos=[start_index,end_index,True]
+
 
                 else:
                     continue
@@ -102,39 +117,43 @@ def string_table(gene,x_axis_string):
 
     return substring_pos
 
-#global frame
-with open('rosalind_long.txt','r') as f:
-    geneassembly=[]
-    for line in f:
-        if '>' not in line:
-            line=line.strip().replace(' ','')
-            geneassembly.append(line)
+def Main():
+    with open('input.txt','r') as f:
+        geneassembly=[]
+        for entry in SeqIO.parse(f,'fasta'):
+            geneassembly.append(str(entry.seq))
 
-superstring=str(geneassembly[0])
-geneassembly.pop(0)
+    superstring=geneassembly[0]
+    geneassembly.pop(0)
 
 
-while len(geneassembly)!=0:
-    genome=geneassembly[0]
-        #string_table will check for the substring pos if there is one
-    if genome in superstring:
-        geneassembly.remove(genome)
-        continue
-
-    substring_coord=string_table(genome, superstring)
-
-    if not substring_coord:
-
-        geneassembly.remove(genome)
-        geneassembly.append(genome)
-
-
-    elif substring_coord[2]:
-        superstring=string_concat(substring_coord,genome,superstring)
-        geneassembly.remove(genome)
-
-
-output(superstring)
-
+    while len(geneassembly)!=0:
+        genome=geneassembly[0]
+            #string_table will check for the substring pos if there is one
+        if genome in superstring:
+            geneassembly.remove(genome)
+            continue
+        else:
+            # substring_coord=string_table(genome, superstring)
+            check=if_overlap(genome,superstring)
+            if check !=3:
+                substring_coord=string_table(genome,superstring)
+                superstring=string_concat(substring_coord,genome,superstring)
+                geneassembly.remove(genome)
+            else:
+                geneassembly.remove(genome)
+                geneassembly.append(genome)
+            # if not substring_coord:
+            #
+            #     geneassembly.remove(genome)
+            #     geneassembly.append(genome)
 
 
+            # elif substring_coord[2]:
+            #     superstring=string_concat(substring_coord,genome,superstring)
+            #     geneassembly.remove(genome)
+
+
+    output(superstring)
+
+Main()
