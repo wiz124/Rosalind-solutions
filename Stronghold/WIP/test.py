@@ -1,18 +1,15 @@
-# string=('abcdefg')
+# def find_max(numbers):
+#    max_num = numbers[0]
+#    for num in numbers:
+#        if num > max_num:
+#            max_num = num
+#    return max_num
 #
-# for i in range(len(string)-1,-1,-1):
-#     print(string[i])
-def map_word_length_to_words(words):
-    length_dict = {}
-    for word in words:
-        length = len(word)
-        if length not in length_dict:
-            length_dict[length] = []
-        else:
-            length_dict[length].append(word)
-    return length_dict
+# print(find_max([3, 5, 2, 8, 6])) # Expected output: 8
+# print(find_max([-1, -5, -3, -4])) # Expected output: -1
+# print(find_max([7])) # Expected output: 7
+# print(find_max([])) # Expected output: None
 
 
-words = ["Joy", "Star", "Chill", "Dream", "Hope", "Quick", "Brave", "Fun", "Code", "Smile"]
-length_mapping = map_word_length_to_words(words)
-print(length_mapping)
+string='abcdefg'
+print(string[1:3])
